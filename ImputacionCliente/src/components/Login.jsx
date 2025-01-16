@@ -1,54 +1,104 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 const Login = () => {
+  const [user, setUser] = useState('');
+  const [password, setPassword] = useState('');
+  const [isUserValid, setIsUserValid] = useState(true);
+  const [isPasswordValid, setIsPasswordValid] = useState(true);
+
+  const validateUser = (user) => {
+    return user.length > 2;
+  };
+
+  const validatePassword = (password) => {
+    return password.length >= 6;
+  };
+
+  const handleUserChange = (e) => {
+    setUser(e.target.value);
+    setIsUserValid(true);
+  };
+
+  const handlePasswordChange = (e) => {
+    setPassword(e.target.value);
+    setIsPasswordValid(true);
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    let valid = true;
+
+    if (!validateUser(user)) {
+      setIsUserValid(false);
+      valid = false;
+    }
+
+    if (!validatePassword(password)) {
+      setIsPasswordValid(false);
+      valid = false;
+    }
+
+    if (valid) {
+      console.log('Inicio de sesión exitoso');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#38B5AD] via-[#5CC1CE] to-[#A0CF9F] flex items-center justify-center px-4">
       <div className="bg-white shadow-lg rounded-lg p-8 w-full max-w-md">
-        {/* Logo */}
         <div className="flex justify-center mb-6">
           <img
-            src="../../public/logoUnited.png" // Reemplaza con la ruta de tu logo
+            src="../../public/logoUnited.png"
             alt="Logo de la empresa"
             className="h-16"
           />
         </div>
 
-        {/* Título */}
         <h2 className="text-2xl font-bold text-gray-800 text-center mb-6">
           Iniciar Sesión
         </h2>
 
-        {/* Formulario */}
-        <form className="space-y-4">
-          {/* Campo de Email */}
+        <form className="space-y-4" onSubmit={handleSubmit}>
           <div>
-            <label htmlFor="usuario" className="block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="user"
+              className={`block text-sm font-medium ${isUserValid ? 'text-gray-700' : 'text-red-600'}`}
+            >
               Usuario
             </label>
             <input
-              type="email"
-              id="email"
+              type="text"
+              id="user"
+              value={user}
+              onChange={handleUserChange}
               placeholder="Ingresa tu usuario"
-              className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-[#38B5AD] focus:border-[#38B5AD] sm:text-sm"
-              required
+              className={`mt-1 block w-full px-4 py-2 border ${isUserValid ? 'border-gray-300' : 'border-red-600'} rounded-md shadow-sm focus:ring-[#38B5AD] focus:border-[#38B5AD] sm:text-sm`}
             />
+            {!isUserValid && (
+              <p className="mt-1 text-sm text-red-600">El usuario debe tener al menos 3 caracteres.</p>
+            )}
           </div>
 
-          {/* Campo de Contraseña */}
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="password"
+              className={`block text-sm font-medium ${isPasswordValid ? 'text-gray-700' : 'text-red-600'}`}
+            >
               Contraseña
             </label>
             <input
               type="password"
               id="password"
+              value={password}
+              onChange={handlePasswordChange}
               placeholder="Ingresa tu contraseña"
-              className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-[#38B5AD] focus:border-[#38B5AD] sm:text-sm"
-              required
+              className={`mt-1 block w-full px-4 py-2 border ${isPasswordValid ? 'border-gray-300' : 'border-red-600'} rounded-md shadow-sm focus:ring-[#38B5AD] focus:border-[#38B5AD] sm:text-sm`}
             />
+            {!isPasswordValid && (
+              <p className="mt-1 text-sm text-red-600">La contraseña debe tener al menos 6 caracteres.</p>
+            )}
           </div>
 
-          {/* Botón de Inicio de Sesión */}
           <div>
             <button
               type="submit"
@@ -59,7 +109,6 @@ const Login = () => {
           </div>
         </form>
 
-        {/* Enlace de Registro */}
         <p className="mt-6 text-center text-sm text-gray-600">
           ¿No tienes una cuenta?{' '}
           <a href="#" className="text-[#38B5AD] font-medium hover:underline">
