@@ -6,6 +6,7 @@ export default function ListaImputaciones() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [imputacionEnEdicion, setImputacionEnEdicion] = useState(null);
+  const [eliminando, setEliminando] = useState(null);
 
   useEffect(() => {
     cargarImputaciones();
@@ -43,16 +44,43 @@ export default function ListaImputaciones() {
 
   const handleGuardarEdicion = async (imputacionActualizada) => {
     try {
-      // Actualizar el estado local
       setImputaciones(prev =>
         prev.map(imp =>
           imp.id === imputacionActualizada.id ? imputacionActualizada : imp
         )
       );
       setImputacionEnEdicion(null);
-      await cargarImputaciones(); // Recargar para asegurar datos actualizados
+      await cargarImputaciones();
     } catch (error) {
       console.error('Error al actualizar:', error);
+    }
+  };
+
+  const handleEliminar = async (id) => {
+    if (!window.confirm('¿Estás seguro de que quieres eliminar esta imputación?')) {
+      return;
+    }
+
+    setEliminando(id);
+    try {
+      const response = await fetch(`http://localhost/EliminarImputacion.php?id=${id}`, {
+        method: 'DELETE',
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Error al eliminar la imputación');
+      }
+
+      if (data.status === 'success') {
+        setImputaciones(prev => prev.filter(imp => imp.id !== id));
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Error al eliminar la imputación');
+    } finally {
+      setEliminando(null);
     }
   };
 
@@ -114,12 +142,22 @@ export default function ListaImputaciones() {
                       <span className="font-semibold text-[#38B5AD]">
                         {new Date(imputacion.fecha).toLocaleDateString()}
                       </span>
-                      <button
-                        onClick={() => handleEditar(imputacion)}
-                        className="text-sm text-[#38B5AD] hover:text-[#38B5AD]/80 px-2 py-1 rounded"
-                      >
-                        Editar
-                      </button>
+                      <div className="flex space-x-2">
+                        <button
+                          onClick={() => handleEditar(imputacion)}
+                          className="text-sm text-[#38B5AD] hover:text-[#38B5AD]/80 px-2 py-1 rounded"
+                          disabled={eliminando === imputacion.id}
+                        >
+                          Editar
+                        </button>
+                        <button
+                          onClick={() => handleEliminar(imputacion.id)}
+                          className="text-sm text-red-600 hover:text-red-700 px-2 py-1 rounded"
+                          disabled={eliminando === imputacion.id}
+                        >
+                          {eliminando === imputacion.id ? 'Eliminando...' : 'Eliminar'}
+                        </button>
+                      </div>
                     </div>
                     <p className="text-right">{imputacion.horas} horas</p>
                     <p>
