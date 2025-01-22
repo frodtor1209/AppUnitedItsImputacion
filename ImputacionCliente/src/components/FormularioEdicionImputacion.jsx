@@ -39,9 +39,15 @@ export default function FormularioEdicionImputacion({ imputacion, onCancel, onSa
         throw new Error(data.message || 'Error al actualizar la imputación');
       }
 
-      onSave(datosActualizados);
+      // Solo si la actualización fue exitosa, llamamos a onSave
+      if (data.status === 'success') {
+        onSave(datosActualizados);
+      } else {
+        throw new Error(data.message || 'Error al actualizar la imputación');
+      }
     } catch (error) {
       setError(error.message);
+      console.error('Error:', error);
     } finally {
       setIsLoading(false);
     }
