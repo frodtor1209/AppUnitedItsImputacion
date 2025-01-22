@@ -1,62 +1,76 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-const Login = () => {
+const Login = ({ onLogin }) => {
   const [user, setUser] = useState('');
   const [password, setPassword] = useState('');
   const [isUserValid, setIsUserValid] = useState(true);
   const [isPasswordValid, setIsPasswordValid] = useState(true);
+  const [errorMessage, setErrorMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
 
-  const validateUser = (user) => {
-    return user.length > 2;
-  };
+  const validateUser = (user) => user.length > 2;
+  const validatePassword = (password) => password.length >= 6;
 
-  const validatePassword = (password) => {
-    return password.length >= 6;
-  };
-
-  const handleUserChange = (e) => {
-    setUser(e.target.value);
-    setIsUserValid(true);
-  };
-
-  const handlePasswordChange = (e) => {
-    setPassword(e.target.value);
-    setIsPasswordValid(true);
-  };
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    let valid = true;
+    setErrorMessage('');
+    
+    // Validación de campos
+    const isUserValidated = validateUser(user);
+    const isPasswordValidated = validatePassword(password);
+    
+    setIsUserValid(isUserValidated);
+    setIsPasswordValid(isPasswordValidated);
 
-    if (!validateUser(user)) {
-      setIsUserValid(false);
-      valid = false;
+    if (!isUserValidated || !isPasswordValidated) {
+      return;
     }
 
-    if (!validatePassword(password)) {
-      setIsPasswordValid(false);
-      valid = false;
-    }
+    setIsLoading(true);
 
-    if (valid) {
-      console.log('Inicio de sesión exitoso');
+    try {
+      const response = await fetch('http://localhost/login.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ user, password })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Error en el inicio de sesión');
+      }
+
+      if (data.status === 'success') {
+        onLogin();
+        navigate('/inicio');
+      } else {
+        setErrorMessage(data.message || 'Error al iniciar sesión');
+      }
+    } catch (error) {
+      setErrorMessage(error.message || 'Error de conexión');
+      console.error('Error:', error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#38B5AD] via-[#5CC1CE] to-[#A0CF9F] flex items-center justify-center px-4">
       <div className="bg-white shadow-lg rounded-lg p-8 w-full max-w-md">
-        <div className="flex justify-center mb-6">
-          <img
-            src="../../public/logoUnited.png"
-            alt="Logo de la empresa"
-            className="h-16"
-          />
-        </div>
-
         <h2 className="text-2xl font-bold text-gray-800 text-center mb-6">
           Iniciar Sesión
         </h2>
+
+        {errorMessage && (
+          <div className="bg-red-50 text-red-600 p-3 rounded-md mb-4 text-center">
+            {errorMessage}
+          </div>
+        )}
 
         <form className="space-y-4" onSubmit={handleSubmit}>
           <div>
@@ -70,12 +84,20 @@ const Login = () => {
               type="text"
               id="user"
               value={user}
-              onChange={handleUserChange}
+              onChange={(e) => {
+                setUser(e.target.value);
+                setIsUserValid(true);
+              }}
               placeholder="Ingresa tu usuario"
-              className={`mt-1 block w-full px-4 py-2 border ${isUserValid ? 'border-gray-300' : 'border-red-600'} rounded-md shadow-sm focus:ring-[#38B5AD] focus:border-[#38B5AD] sm:text-sm`}
+              className={`mt-1 block w-full px-4 py-2 border ${
+                isUserValid ? 'border-gray-300' : 'border-red-600'
+              } rounded-md shadow-sm focus:ring-[#38B5AD] focus:border-[#38B5AD] sm:text-sm`}
+              disabled={isLoading}
             />
             {!isUserValid && (
-              <p className="mt-1 text-sm text-red-600">El usuario debe tener al menos 3 caracteres.</p>
+              <p className="mt-1 text-sm text-red-600">
+                El usuario debe tener al menos 3 caracteres.
+              </p>
             )}
           </div>
 
@@ -90,23 +112,30 @@ const Login = () => {
               type="password"
               id="password"
               value={password}
-              onChange={handlePasswordChange}
+              onChange={(e) => {
+                setPassword(e.target.value);
+                setIsPasswordValid(true);
+              }}
               placeholder="Ingresa tu contraseña"
-              className={`mt-1 block w-full px-4 py-2 border ${isPasswordValid ? 'border-gray-300' : 'border-red-600'} rounded-md shadow-sm focus:ring-[#38B5AD] focus:border-[#38B5AD] sm:text-sm`}
+              className={`mt-1 block w-full px-4 py-2 border ${
+                isPasswordValid ? 'border-gray-300' : 'border-red-600'
+              } rounded-md shadow-sm focus:ring-[#38B5AD] focus:border-[#38B5AD] sm:text-sm`}
+              disabled={isLoading}
             />
             {!isPasswordValid && (
-              <p className="mt-1 text-sm text-red-600">La contraseña debe tener al menos 6 caracteres.</p>
+              <p className="mt-1 text-sm text-red-600">
+                La contraseña debe tener al menos 6 caracteres.
+              </p>
             )}
           </div>
 
-          <div>
-            <button
-              type="submit"
-              className="w-full py-2 px-4 bg-[#38B5AD] text-white font-semibold rounded-md shadow hover:bg-[#5CC1CE] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#38B5AD]"
-            >
-              Iniciar Sesión
-            </button>
-          </div>
+          <button
+            type="submit"
+            className="w-full py-2 px-4 bg-[#38B5AD] text-white font-semibold rounded-md shadow hover:bg-[#5CC1CE] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#38B5AD] disabled:opacity-50"
+            disabled={isLoading}
+          >
+            {isLoading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
+          </button>
         </form>
 
         <p className="mt-6 text-center text-sm text-gray-600">
