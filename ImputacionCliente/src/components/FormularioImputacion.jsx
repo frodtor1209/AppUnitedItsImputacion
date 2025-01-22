@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-export default function FormularioImputacion({ onAgregarImputacion }) {
+export default function FormularioImputacion({ userId, userName }) {
   const [fecha, setFecha] = useState("");
   const [horaInicio, setHoraInicio] = useState("");
   const [horaFin, setHoraFin] = useState("");
@@ -24,7 +24,9 @@ export default function FormularioImputacion({ onAgregarImputacion }) {
         horas, 
         proyecto, 
         tarea, 
-        descripcion 
+        descripcion,
+        userId,
+        userName 
       };
 
       try {
@@ -42,9 +44,6 @@ export default function FormularioImputacion({ onAgregarImputacion }) {
           throw new Error(data.message || 'Error al guardar la imputación');
         }
 
-        // Si todo sale bien, actualizamos el estado local
-        onAgregarImputacion(nuevaImputacion);
-        
         // Limpiamos el formulario
         setFecha("");
         setHoraInicio("");
@@ -52,6 +51,11 @@ export default function FormularioImputacion({ onAgregarImputacion }) {
         setProyecto("");
         setTarea("");
         setDescripcion("");
+
+        // Recargamos la lista de imputaciones si es necesario
+        if (typeof onSuccess === 'function') {
+          onSuccess();
+        }
 
       } catch (error) {
         setError(error.message);

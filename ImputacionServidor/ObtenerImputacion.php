@@ -30,8 +30,11 @@ try {
         throw new Exception("Error de conexión: " . $conn->connect_error);
     }
     
-    // Consulta para obtener todas las imputaciones ordenadas por fecha descendente
-    $query = "SELECT * FROM imputaciones ORDER BY fecha DESC, hora_inicio DESC";
+    // Modificamos la consulta para incluir el nombre del usuario
+    $query = "SELECT i.*, i.user_name 
+             FROM imputaciones i 
+             ORDER BY i.fecha DESC, i.hora_inicio DESC";
+             
     $result = $conn->query($query);
     
     if ($result === false) {
@@ -51,7 +54,9 @@ try {
             'horas' => $row['horas'],
             'proyecto' => $row['proyecto'],
             'tarea' => $row['tarea'],
-            'descripcion' => $row['descripcion']
+            'descripcion' => $row['descripcion'],
+            'user_id' => $row['user_id'],
+            'user_name' => $row['user_name']
         ];
     }
     

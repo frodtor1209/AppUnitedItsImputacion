@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react';
 import FormularioEdicionImputacion from './FormularioEdicionImputacion';
 
-export default function ListaImputaciones() {
+export default function ListaImputaciones({ userId }) {
   const [imputaciones, setImputaciones] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [imputacionEnEdicion, setImputacionEnEdicion] = useState(null);
   const [eliminando, setEliminando] = useState(null);
 
+  const canEditDelete = userId === 1;
   useEffect(() => {
     cargarImputaciones();
   }, []);
@@ -139,25 +140,32 @@ export default function ListaImputaciones() {
                 <div className="p-4">
                   <div className="grid grid-cols-2 gap-2">
                     <div className="flex items-center justify-between">
-                      <span className="font-semibold text-[#38B5AD]">
-                        {new Date(imputacion.fecha).toLocaleDateString()}
-                      </span>
-                      <div className="flex space-x-2">
-                        <button
-                          onClick={() => handleEditar(imputacion)}
-                          className="text-sm text-[#38B5AD] hover:text-[#38B5AD]/80 px-2 py-1 rounded"
-                          disabled={eliminando === imputacion.id}
-                        >
-                          Editar
-                        </button>
-                        <button
-                          onClick={() => handleEliminar(imputacion.id)}
-                          className="text-sm text-red-600 hover:text-red-700 px-2 py-1 rounded"
-                          disabled={eliminando === imputacion.id}
-                        >
-                          {eliminando === imputacion.id ? 'Eliminando...' : 'Eliminar'}
-                        </button>
+                      <div>
+                        <span className="font-semibold text-[#38B5AD]">
+                          {new Date(imputacion.fecha).toLocaleDateString()}
+                        </span>
+                        <span className="ml-2 text-sm text-gray-500">
+                          por {imputacion.user_name}
+                        </span>
                       </div>
+                      {canEditDelete && (
+                        <div className="flex space-x-2">
+                          <button
+                            onClick={() => handleEditar(imputacion)}
+                            className="text-sm text-[#38B5AD] hover:text-[#38B5AD]/80 px-2 py-1 rounded"
+                            disabled={eliminando === imputacion.id}
+                          >
+                            Editar
+                          </button>
+                          <button
+                            onClick={() => handleEliminar(imputacion.id)}
+                            className="text-sm text-red-600 hover:text-red-700 px-2 py-1 rounded"
+                            disabled={eliminando === imputacion.id}
+                          >
+                            {eliminando === imputacion.id ? 'Eliminando...' : 'Eliminar'}
+                          </button>
+                        </div>
+                      )}
                     </div>
                     <p className="text-right">{imputacion.horas} horas</p>
                     <p>

@@ -4,27 +4,27 @@ import Login from "./components/Login";
 import Inicio from "./components/Inicio";
 
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false); // Estado para saber si está autenticado
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [userId, setUserId] = useState(null);
+  const [userName, setUserName] = useState("");
 
-  // Función para manejar el login
-  const handleLogin = () => {
-    setIsAuthenticated(true); // Simula la autenticación
+  const handleLogin = (userData) => {
+    setIsAuthenticated(true);
+    setUserId(userData.userId);
+    setUserName(userData.userName);
   };
 
   return (
     <Router>
       <Routes>
-        {/* Ruta de login */}
         <Route path="/" element={<Login onLogin={handleLogin} />} />
-
-        {/* Ruta protegida */}
         <Route
           path="/inicio"
           element={
             isAuthenticated ? (
-              <Inicio />
+              <Inicio userId={userId} userName={userName} />
             ) : (
-              <Navigate to="/" /> // Redirige al login si no está autenticado
+              <Navigate to="/" />
             )
           }
         />

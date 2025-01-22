@@ -17,7 +17,6 @@ const Login = ({ onLogin }) => {
     e.preventDefault();
     setErrorMessage('');
     
-    // Validación de campos
     const isUserValidated = validateUser(user);
     const isPasswordValidated = validatePassword(password);
     
@@ -46,7 +45,10 @@ const Login = ({ onLogin }) => {
       }
 
       if (data.status === 'success') {
-        onLogin();
+        onLogin({
+          userId: data.userId,
+          userName: data.userName
+        });
         navigate('/inicio');
       } else {
         setErrorMessage(data.message || 'Error al iniciar sesión');
