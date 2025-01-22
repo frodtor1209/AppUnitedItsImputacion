@@ -24,11 +24,9 @@ git clone https://github.com/tu-usuario/app-imputacion.git
 cd app-imputacion
 
 ### 2. Instalar las dependencias
-```bash
 npm install o yarn install
 
 ### 3. Instalar tailwindcss
-```bash
 npm install -D tailwindcss postcss autoprefixer
 
 ### 4. Ejecutar la aplicación
