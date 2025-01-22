@@ -32,21 +32,24 @@ export default function Header({ userName }) {
         <header className="bg-white shadow-md py-4">
             <div className="p-2 flex justify-between items-center w-full">
                 <h1 className="text-2xl font-semibold text-[#38B5AD]">Imputacion United</h1>
+                <img src="../../public/logoUnited.png" alt="Logo United" className="h-14" />
                 <div className="relative flex items-center space-x-2 text-[#38B5AD]">
-                    <div onClick={toggleMenu} className="flex items-center space-x-2 hover:border-2 hover:border-[#38B5AD] rounded-full p-1 cursor-pointer">
+                    <div
+                        onClick={toggleMenu}
+                        className="flex items-center justify-center space-x-2 border-2 border-transparent hover:border-[#38B5AD] rounded-full p-1 cursor-pointer transition-colors duration-200"
+                    >
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
                             viewBox="0 0 24 24"
-                            stroke-width="2"
+                            fill="none"
                             stroke="currentColor"
+                            strokeWidth="1.5"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
                             className="w-6 h-6"
                         >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                d="M12 14c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zM12 18c-3.313 0-6 2.687-6 6h12c0-3.313-2.687-6-6-6z"
-                            />
+                            <circle cx="12" cy="8" r="4.5" />
+                            <path d="M20 21c0-4.4-3.6-8-8-8s-8 3.6-8 8" />
                         </svg>
 
                         <span className="cursor-pointer font-medium">{userName}</span>

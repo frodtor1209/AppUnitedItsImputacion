@@ -30,7 +30,7 @@ export default function FormularioImputacion({ userId, userName }) {
       };
 
       try {
-        const response = await fetch('http://localhost/GuardarImputacion.php', {
+        const response = await fetch('http://localhost:3000/imputaciones', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function FormularioEdicionImputacion({ imputacion, onCancel, onSave }) {
+  // Formateamos los valores iniciales al crear el estado
   const [formData, setFormData] = useState({
-    fecha: imputacion.fecha,
-    horaInicio: imputacion.horaInicio,
-    horaFin: imputacion.horaFin,
+    fecha: formatearFecha(imputacion.fecha),
+    horaInicio: formatearHora(imputacion.horaInicio),
+    horaFin: formatearHora(imputacion.horaFin),
     proyecto: imputacion.proyecto,
     tarea: imputacion.tarea,
     descripcion: imputacion.descripcion,
@@ -12,20 +13,45 @@ export default function FormularioEdicionImputacion({ imputacion, onCancel, onSa
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
+  // Función para formatear la fecha a YYYY-MM-DD
+  function formatearFecha(fecha) {
+    if (!fecha) return '';
+    const date = new Date(fecha);
+    return date.toISOString().split('T')[0];
+  }
+
+  // Función para formatear la hora a HH:mm
+  function formatearHora(hora) {
+    if (!hora) return '';
+    // Si la hora ya está en formato HH:mm, la devolvemos tal cual
+    if (hora.match(/^\d{2}:\d{2}$/)) return hora;
+    // Si la hora viene en otro formato, intentamos convertirla
+    try {
+      const [hours, minutes] = hora.split(':');
+      return `${hours.padStart(2, '0')}:${minutes.padStart(2, '0')}`;
+    } catch (e) {
+      return '';
+    }
+  }
+
+  // Verificamos que los datos se formatean correctamente
+  useEffect(() => {
+    console.log('Datos formateados:', formData);
+  }, [formData]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     setError("");
 
-    const horasCalculadas = calcularHoras(formData.horaInicio, formData.horaFin);
-    const datosActualizados = {
-      ...formData,
-      id: imputacion.id,
-      horas: horasCalculadas,
-    };
-
     try {
-      const response = await fetch('http://localhost/ActualizarImputacion.php', {
+      const horasCalculadas = calcularHoras(formData.horaInicio, formData.horaFin);
+      const datosActualizados = {
+        ...formData,
+        horas: horasCalculadas,
+      };
+
+      const response = await fetch(`http://localhost:3000/imputaciones/${imputacion.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -39,15 +65,18 @@ export default function FormularioEdicionImputacion({ imputacion, onCancel, onSa
         throw new Error(data.message || 'Error al actualizar la imputación');
       }
 
-      // Solo si la actualización fue exitosa, llamamos a onSave
       if (data.status === 'success') {
-        onSave(datosActualizados);
+        onSave({
+          id: imputacion.id,
+          ...datosActualizados,
+          user_id: imputacion.user_id,
+          user_name: imputacion.user_name
+        });
       } else {
         throw new Error(data.message || 'Error al actualizar la imputación');
       }
     } catch (error) {
       setError(error.message);
-      console.error('Error:', error);
     } finally {
       setIsLoading(false);
     }

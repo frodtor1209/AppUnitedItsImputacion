@@ -15,7 +15,7 @@ export default function ListaImputaciones({ userId }) {
 
   const cargarImputaciones = async () => {
     try {
-      const response = await fetch('http://localhost/ObtenerImputacion.php');
+      const response = await fetch('http://localhost:3000/imputaciones');
       const data = await response.json();
 
       if (!response.ok) {
@@ -64,7 +64,7 @@ export default function ListaImputaciones({ userId }) {
 
     setEliminando(id);
     try {
-      const response = await fetch(`http://localhost/EliminarImputacion.php?id=${id}`, {
+      const response = await fetch(`http://localhost:3000/imputaciones/${id}`, {
         method: 'DELETE',
       });
 
