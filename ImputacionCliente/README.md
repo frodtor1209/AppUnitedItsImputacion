@@ -44,4 +44,10 @@ npm install react-router-dom
 npm run dev o yarn dev
 ```
 
+### 6. Ejecutar el servidor
+```bash
+cd ImputacionServidor
+node servidor.js
+```
+
 Una vez que se haya ejecutado la aplicación, se abrirá automáticamente en tu navegador web.
